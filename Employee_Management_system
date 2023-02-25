@@ -1,0 +1,76 @@
+import pickle
+
+class Employee:
+    def __init__(self, name, age, salary, job_title):
+        self.name = name
+        self.age = age
+        self.salary = salary
+        self.job_title = job_title
+
+class EmployeeManagementSystem:
+    def __init__(self):
+        self.employees = []
+        self.load_employees()
+
+    def load_employees(self):
+        try:
+            with open("employees.dat", "rb") as f:
+                self.employees = pickle.load(f)
+        except FileNotFoundError:
+            pass
+
+    def save_employees(self):
+        with open("employees.dat", "wb") as f:
+            pickle.dump(self.employees, f)
+
+    def add_employee(self, name, age, salary, job_title):
+        employee = Employee(name, age, salary, job_title)
+        self.employees.append(employee)
+        self.save_employees()
+
+    def update_employee(self, name, age, salary, job_title):
+        for employee in self.employees:
+            if employee.name == name:
+                employee.age = age
+                employee.salary = salary
+                employee.job_title = job_title
+                self.save_employees()
+                return True
+        return False
+
+    def delete_employee(self, name):
+        for employee in self.employees:
+            if employee.name == name:
+                self.employees.remove(employee)
+                self.save_employees()
+                return True
+        return False
+
+    def search_employee(self, search_term):
+        results = []
+        for employee in self.employees:
+            if search_term.lower() in employee.name.lower() or search_term.lower() in employee.job_title.lower():
+                results.append(employee)
+        return results
+
+    def get_average_salary(self):
+        if not self.employees:
+            return 0
+        total_salary = sum(employee.salary for employee in self.employees)
+        return total_salary / len(self.employees)
+
+    def get_maximum_salary(self):
+        if not self.employees:
+            return 0
+        return max(employee.salary for employee in self.employees)
+
+    def get_minimum_salary(self):
+        if not self.employees:
+            return 0
+        return min(employee.salary for employee in self.employees)
+
+    def menu(self):
+        print("1. Add employee")
+        print("2. Update employee")
+        print("3. Delete employee")
+        print("4. Search employee")
